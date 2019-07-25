@@ -2,7 +2,8 @@
 
 module.exports = {
     UpdateFetcher: require('./lib/UpdateFetcher'),
-    UpdateVerifier: require('./lib/UpdateVerifier')
+    UpdateVerifier: require('./lib/UpdateVerifier'),
+    Utility: require('./lib/Utility')
 };
 
 /*
