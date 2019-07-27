@@ -18,7 +18,6 @@ module.exports = class Bond {
         this.verifier = verifier;
     }
 
-
     /**
      * Generate a Bond instance from configuration
      *
@@ -35,5 +34,38 @@ module.exports = class Bond {
             uv.addPublicKey(publicKeys[i]);
         }
         return new Bond(fetcher, uv);
+    }
+
+    /**
+     * Add a public key to the UpdateVerifier.
+     *
+     * @param {string|Buffer|AsymmetricPublicKey} publicKey
+     * @returns {Bond}
+     */
+    addPublicKey(publicKey) {
+        this.verifier.addPublicKey(publicKey);
+        return this;
+    }
+
+    /**
+     * Add an alternative mirror for the update server.
+     *
+     * @param {string} url
+     * @returns {Bond}
+     */
+    addServerUrl(url) {
+        this.fetcher.addMirror(url);
+        return this;
+    }
+
+    /**
+     * Supply an access token to the UpdateFetcher.
+     *
+     * @param {string} token
+     * @returns {Bond}
+     */
+    setAccessToken(token = '') {
+        this.fetcher.accessToken = token;
+        return this;
     }
 };
