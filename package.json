@@ -15,6 +15,7 @@
     "request": "^2.88.0",
     "request-promise-native": "^1.0.7",
     "rfc4648": "^1.2.0",
+    "sapient": "^0.3.0",
     "tmp-promise": "^2.0.2"
   }
 }
