@@ -1,6 +1,6 @@
 {
   "name": "libvalence",
-  "version": "0.1.1",
+  "version": "0.2.0",
   "description": "Library for verifying signatures, etc. on Valence update files.",
   "main": "index.js",
   "repository": "https://github.com/soatok/libvalence",
