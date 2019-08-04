@@ -1,5 +1,8 @@
 "use strict";
 
+const Chronicle = require('./lib/CryptoLedger/Chronicle');
+const Quorum = require('./lib/Quorum');
+const Release = require('./lib/Release');
 const SemVerUpdatePolicy = require('./lib/UpdatePolicies/SemVerUpdatePolicy');
 const UpdateApplier = require('./lib/UpdateApplier');
 const UpdateFetcher = require('./lib/UpdateFetcher');
@@ -18,13 +21,15 @@ module.exports = class Bond {
      * @param {UpdateFetcher|null} fetcher
      * @param {UpdateVerifier|null} verifier
      * @param {UpdatePolicy|null} policy
+     * @param {Quorum|null} quorum
      */
     constructor(
         projectName = '',
         projectDir = '',
         fetcher = null,
         verifier = null,
-        policy = null
+        policy = null,
+        quorum = null
     ) {
         if (!fetcher) {
             fetcher = new UpdateFetcher();
@@ -35,10 +40,14 @@ module.exports = class Bond {
         if (!policy) {
             policy = new SemVerUpdatePolicy();
         }
+        if (!quorum) {
+            quorum = new Quorum([]);
+        }
         this.projectName = projectName;
         this.applier = new UpdateApplier(projectDir);
         this.fetcher = fetcher;
         this.policy = policy;
+        this.quorum = quorum;
         this.verifier = verifier;
     }
 
@@ -66,6 +75,16 @@ module.exports = class Bond {
             uv.addPublicKey(publicKeys[i]);
         }
         return new Bond(projectName, projectDir, fetcher, uv);
+    }
+
+    /**
+     * @param {string} url
+     * @param {string|SigningPublicKey} publicKey
+     * @returns {Bond}
+     */
+    addChronicle(url, publicKey) {
+        this.quorum.addChronicle(new Chronicle(url, publicKey));
+        return this;
     }
 
     /**
@@ -99,6 +118,12 @@ module.exports = class Bond {
     async autoUpdate(channel = '') {
         let update = this.getUpdate(channel);
         if (!update) {
+            return false;
+        }
+        if (!this.verifier.verify(update.publicKeyId, update.signature, update.path)) {
+            return false;
+        }
+        if (!this.quorum.consensusAgrees(update.summaryHash)) {
             return false;
         }
         return this.applier.doUpdate(update);
