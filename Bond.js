@@ -78,6 +78,8 @@ module.exports = class Bond {
     }
 
     /**
+     * Adds a new Chronicle to the Quorum.
+     *
      * @param {string} url
      * @param {string|SigningPublicKey} publicKey
      * @returns {Bond}
@@ -85,6 +87,50 @@ module.exports = class Bond {
     addChronicle(url, publicKey) {
         this.quorum.addChronicle(new Chronicle(url, publicKey));
         return this;
+    }
+
+    /**
+     * Add a public key to the UpdateVerifier.
+     *
+     * @param {string|Buffer|AsymmetricPublicKey} publicKey
+     * @returns {Bond}
+     */
+    addPublicKey(publicKey) {
+        this.verifier.addPublicKey(publicKey);
+        return this;
+    }
+
+    /**
+     * Add an alternative mirror for the update server.
+     *
+     * @param {string} url
+     * @returns {Bond}
+     */
+    addServerUrl(url) {
+        this.fetcher.addMirror(url);
+        return this;
+    }
+
+    /**
+     * Get a list of updates and, if we are meant to apply them,
+     * apply the most recent one.
+     *
+     * @param {string} channel
+     * @param {boolean} forceUpdate
+     * @returns {Promise<boolean>}
+     */
+    async autoUpdate(channel = '', forceUpdate = false) {
+        let update = this.getUpdate(channel, forceUpdate);
+        if (!update) {
+            return false;
+        }
+        if (!this.verifier.verify(update.publicKeyId, update.signature, update.path)) {
+            return false;
+        }
+        if (!this.quorum.consensusAgrees(update.summaryHash)) {
+            return false;
+        }
+        return this.applier.doUpdate(update);
     }
 
     /**
@@ -106,27 +152,6 @@ module.exports = class Bond {
             updateList.mirror,
             this.verifier
         );
-    }
-
-    /**
-     * Get a list of updates and, if we are meant to apply them,
-     * apply the most recent one.
-     *
-     * @param {string} channel
-     * @returns {Promise<boolean>}
-     */
-    async autoUpdate(channel = '') {
-        let update = this.getUpdate(channel);
-        if (!update) {
-            return false;
-        }
-        if (!this.verifier.verify(update.publicKeyId, update.signature, update.path)) {
-            return false;
-        }
-        if (!this.quorum.consensusAgrees(update.summaryHash)) {
-            return false;
-        }
-        return this.applier.doUpdate(update);
     }
 
     /**
@@ -154,38 +179,13 @@ module.exports = class Bond {
     }
 
     /**
-     * Add a public key to the UpdateVerifier.
+     * Supply an access token to the UpdateFetcher.
      *
-     * @param {string|Buffer|AsymmetricPublicKey} publicKey
+     * @param {string} token
      * @returns {Bond}
      */
-    addPublicKey(publicKey) {
-        this.verifier.addPublicKey(publicKey);
-        return this;
-    }
-
-    /**
-     * Specify an update policy for determining if an update should be installed.
-     *
-     * @param {UpdatePolicy} policy
-     * @returns {Bond}
-     */
-    setUpdatePolicy(policy) {
-        if (!(policy instanceof UpdatePolicy)) {
-            throw new TypeError("Argument 1 must be an instance of UpdatePolicy");
-        }
-        this.policy = policy;
-        return this;
-    }
-
-    /**
-     * Add an alternative mirror for the update server.
-     *
-     * @param {string} url
-     * @returns {Bond}
-     */
-    addServerUrl(url) {
-        this.fetcher.addMirror(url);
+    setAccessToken(token = '') {
+        this.fetcher.accessToken = token;
         return this;
     }
 
@@ -212,13 +212,16 @@ module.exports = class Bond {
     }
 
     /**
-     * Supply an access token to the UpdateFetcher.
+     * Specify an update policy for determining if an update should be installed.
      *
-     * @param {string} token
+     * @param {UpdatePolicy} policy
      * @returns {Bond}
      */
-    setAccessToken(token = '') {
-        this.fetcher.accessToken = token;
+    setUpdatePolicy(policy) {
+        if (!(policy instanceof UpdatePolicy)) {
+            throw new TypeError("Argument 1 must be an instance of UpdatePolicy");
+        }
+        this.policy = policy;
         return this;
     }
 };
