@@ -201,6 +201,31 @@ module.exports = class Bond {
     }
 
     /**
+     * Set the number of Chronicles we'll query to determine if all of the
+     * replicas have a record of the same value.
+     *
+     * @param {number} int
+     * @returns {Bond}
+     */
+    setQuorumSamples(int) {
+        this.quorum.samples = int;
+        return this;
+    }
+
+    /**
+     * Set the number of affirmative responses from various Chronicles
+     * are necessary in order to have confidence in the transparency of
+     * a record.
+     *
+     * @param {number} int
+     * @returns {Bond}
+     */
+    setQuorumThreshold(int) {
+        this.quorum.threshold = int;
+        return this;
+    }
+
+    /**
      * Set the project name
      *
      * @param {string} name
