@@ -1,6 +1,6 @@
 {
   "name": "libvalence",
-  "version": "0.3.0",
+  "version": "0.3.1",
   "description": "Library for verifying signatures, etc. on Valence update files.",
   "main": "index.js",
   "repository": "https://github.com/soatok/libvalence",
@@ -9,7 +9,7 @@
   "license": "ISC",
   "dependencies": {
     "del": "^5.0.0",
-    "dhole-crypto": "^0.5.1",
+    "dhole-crypto": "^0.5.2",
     "jszip": "^3.2.2",
     "recursive-copy": "^2.0.10",
     "request": "^2.88.0",
