@@ -95,8 +95,8 @@ module.exports = class Bond {
      * @param {string|Buffer|AsymmetricPublicKey} publicKey
      * @returns {Bond}
      */
-    addPublicKey(publicKey) {
-        this.verifier.addPublicKey(publicKey);
+    async addPublicKey(publicKey) {
+        await this.verifier.addPublicKey(publicKey);
         return this;
     }
 

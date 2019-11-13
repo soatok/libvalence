@@ -9,13 +9,14 @@
   "license": "ISC",
   "dependencies": {
     "del": "^5.0.0",
-    "dhole-crypto": "^0.5.2",
+    "dhole-crypto": "^0.7.0",
     "jszip": "^3.2.2",
     "recursive-copy": "^2.0.10",
     "request": "^2.88.0",
-    "request-promise-native": "^1.0.7",
+    "request-promise-native": "^1.0.8",
     "rfc4648": "^1.2.0",
-    "sapient": "^0.3.0",
+    "sapient": "^0.4.1",
+    "sodium-plus": "^0.4.2",
     "tmp-promise": "^2.0.2"
   }
 }
